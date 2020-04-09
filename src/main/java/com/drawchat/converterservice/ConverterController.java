@@ -33,11 +33,6 @@ public class ConverterController {
 //        return fileContent;
 //    }
 
-    @GetMapping("/asd")
-    public String a() {
-        return "asdasdsa";
-    }
-
     @GetMapping("/convert")
     public String convert( @RequestBody String req) throws Exception {
         if(req == null || req == "")
