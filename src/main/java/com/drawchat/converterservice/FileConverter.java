@@ -30,48 +30,57 @@ public class FileConverter {
     private InputStream inStream;
     private OutputStream outStream;
     private XSLFSlide[] slides;
+    private final long ID;
 
-  public void PPTX2PDF(InputStream inStream, OutputStream outStream) throws Exception {
-      //TODO:Remnant from constructor. Remove the variables.
-      this.inStream = inStream;
-      this.outStream = outStream;
+    public FileConverter() {
+        ID = getRandomNumber(100000, 999999);
+    }
 
-      Dimension pgsize = processSlides();
+    public long getID() {
+        return ID;
+    }
 
-      double zoom = 2; // magnify it by 2 as typical slides are low res
-      AffineTransform at = new AffineTransform();
-      at.setToScale(zoom, zoom);
+    public void PPTX2PDF(InputStream inStream, OutputStream outStream) throws Exception {
+        //TODO:Remnant from constructor. Remove the variables.
+        this.inStream = inStream;
+        this.outStream = outStream;
 
-      Document document = new Document();
+        Dimension pgsize = processSlides();
 
-      PdfWriter writer = PdfWriter.getInstance(document, outStream);
-      document.open();
+        double zoom = 2; // magnify it by 2 as typical slides are low res
+        AffineTransform at = new AffineTransform();
+        at.setToScale(zoom, zoom);
 
-      for (int i = 0; i < getNumSlides(); i++) {
+        Document document = new Document();
 
-          BufferedImage bufImg = new BufferedImage((int)Math.ceil(pgsize.width*zoom), (int)Math.ceil(pgsize.height*zoom), BufferedImage.TYPE_INT_RGB);
-          Graphics2D graphics = bufImg.createGraphics();
-          graphics.setTransform(at);
-          //clear the drawing area
-          graphics.setPaint(getSlideBGColor(i));
-          graphics.fill(new Rectangle2D.Float(0, 0, pgsize.width, pgsize.height));
-          try{
-              drawOntoThisGraphic(i, graphics);
-          } catch(Exception e){
-              //Just ignore
-          }
+        PdfWriter writer = PdfWriter.getInstance(document, outStream);
+        document.open();
 
-          Image image = Image.getInstance(bufImg, null);
-          document.setPageSize(new Rectangle(image.getScaledWidth(), image.getScaledHeight()));
-          document.newPage();
-          image.setAbsolutePosition(0, 0);
-          document.add(image);
-      }
-      document.close();
-      writer.close();
-  }
+        for (int i = 0; i < getNumSlides(); i++) {
 
-  public void PDF2PNG(String sourceFilePath, String targetFolder) throws Exception {
+            BufferedImage bufImg = new BufferedImage((int)Math.ceil(pgsize.width*zoom), (int)Math.ceil(pgsize.height*zoom), BufferedImage.TYPE_INT_RGB);
+            Graphics2D graphics = bufImg.createGraphics();
+            graphics.setTransform(at);
+            //clear the drawing area
+            graphics.setPaint(getSlideBGColor(i));
+            graphics.fill(new Rectangle2D.Float(0, 0, pgsize.width, pgsize.height));
+            try{
+                drawOntoThisGraphic(i, graphics);
+            } catch(Exception e){
+                //Just ignore
+            }
+
+            Image image = Image.getInstance(bufImg, null);
+            document.setPageSize(new Rectangle(image.getScaledWidth(), image.getScaledHeight()));
+            document.newPage();
+            image.setAbsolutePosition(0, 0);
+            document.add(image);
+        }
+        document.close();
+        writer.close();
+    }
+
+    public void PDF2PNG(String sourceFilePath, String targetFolder) throws Exception {
         File sourceFile = new File(sourceFilePath);
         File destinationFile = new File(targetFolder);
         if(!destinationFile.exists()) {
@@ -83,34 +92,34 @@ public class FileConverter {
             System.err.println("ERROR : Source folder does not exists!!!");
             return;
         }
-      System.out.println("Images copied to Folder: "+ destinationFile.getName());
-      PDDocument document = PDDocument.load(sourceFilePath);
-      List<PDPage> list = document.getDocumentCatalog().getAllPages();
-      System.out.println("Total files to be converted -> "+ list.size());
+        System.out.println("Images copied to Folder: "+ destinationFile.getName());
+        PDDocument document = PDDocument.load(sourceFilePath);
+        List<PDPage> list = document.getDocumentCatalog().getAllPages();
+        System.out.println("Total files to be converted -> "+ list.size());
 
-      String fileName = sourceFile.getName().replace(".pdf", "");
-      int pageNumber = 1;
-      for (PDPage page : list) {
-          BufferedImage image = page.convertToImage();
-          File outputfile = new File(targetFolder + "/" + pageNumber +".png");
-          System.out.println("Image Created -> "+ outputfile.getName());
-          ImageIO.write(image, "png", outputfile);
-          pageNumber++;
-      }
-      document.close();
-      System.out.println("Converted Images are saved at -> "+ destinationFile.getAbsolutePath());
-  }
+        String fileName = sourceFile.getName().replace(".pdf", "");
+        int pageNumber = 1;
+        for (PDPage page : list) {
+            BufferedImage image = page.convertToImage();
+            File outputfile = new File(targetFolder + "/" + pageNumber +".png");
+            System.out.println("Image Created -> "+ outputfile.getName());
+            ImageIO.write(image, "png", outputfile);
+            pageNumber++;
+        }
+        document.close();
+        System.out.println("Converted Images are saved at -> "+ destinationFile.getAbsolutePath());
+    }
 
-  public boolean resetFiles() {
-      final Path filesLoc = Paths.get("outputs");
-      boolean status = true;
-      FileSystemUtils.deleteRecursively(filesLoc.toFile());
-      File file = new File(filesLoc.toString() + "/outputs/images");
-      status = file.mkdirs();
-      file = new File(filesLoc.toString() + "/outputs/pdf");
-      status = file.mkdirs();
-      return status;
-  }
+    public boolean resetFiles() {
+        final Path filesLoc = Paths.get("outputs");
+        boolean status = true;
+        FileSystemUtils.deleteRecursively(filesLoc.toFile());
+        File file = new File(filesLoc.toString() + "/outputs/images");
+        status = file.mkdirs();
+        file = new File(filesLoc.toString() + "/outputs/pdf");
+        status = file.mkdirs();
+        return status;
+    }
 
     private Dimension processSlides() throws IOException{
         InputStream iStream = inStream;
@@ -130,6 +139,10 @@ public class FileConverter {
 
     private Color getSlideBGColor(int index){
         return slides[index].getBackground().getFillColor();
+    }
+
+    private long getRandomNumber(long sIndex, long fIndex) {
+        return (long)(Math.random()*((fIndex-sIndex)+1))+sIndex;
     }
 
 }

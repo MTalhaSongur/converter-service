@@ -16,21 +16,44 @@ import java.util.Base64;
 public class ConverterController {
 
     private final Path rootLocation = Paths.get("filestorage");
-//    @GetMapping(
-//            value = "/getConvertedImage",
-//            produces = MediaType.IMAGE_PNG_VALUE
-//    )
-//    public @ResponseBody byte[] getConvertedImage() throws Exception{
+
+    //
+//    @GetMapping("/convert")
+//    public String convert( @RequestBody String req) throws Exception {
+//        if(req == null || req == "")
+//            return "ERROR : No body received!! Cannot Convert Image";
 //
-//        String resourceDir = System.getProperty("user.dir") + "\\filestorage";
+//        String decodedBody = getBase64Decoded(req);
+//        File file = new File(decodedBody);
 //
-//        FileConverter service = new FileConverter(new FileInputStream(resourceDir + "\\inputs\\deneme.pptx"), new FileOutputStream(resourceDir + "\\outputs\\pdf\\current.pdf"));
-//        service.PPTX2PDF();
-//        service.PDF2PNG(resourceDir + "\\outputs\\pdf\\current.pdf", resourceDir + "\\outputs\\images\\");
+//        try {
+//            FileConverter converter = new FileConverter();
+//            //Generate folders based on randomID
+//            generateOutputFolder(rootLocation.resolve("outputs/pdf/").toString(), Long.toString(converter.getID()));
+//            generateOutputFolder(rootLocation.resolve("outputs/images/").toString(), Long.toString(converter.getID()));
+//            //--
+//            converter.PPTX2PDF(new FileInputStream(decodedBody), new FileOutputStream(rootLocation.resolve("outputs/pdf/" + converter.getID() + "/out.pdf").toString()));
+//            converter.PDF2PNG(rootLocation.resolve("outputs/pdf/" + converter.getID() + "/out.pdf").toString(), rootLocation.resolve("outputs/images/" + converter.getID()).toString());
+//        }catch (Exception e){
+//            return e.toString();
+//        }
+//        return "Completed.";
+//    }
 //
-//        File fi = new File(resourceDir + "\\inputs\\Alliswell.png");
-//        byte[] fileContent = Files.readAllBytes(fi.toPath());
-//        return fileContent;
+//    @GetMapping("/convertdefault")
+//    public String convertDefault() throws Exception {
+//        try {
+//            FileConverter converter = new FileConverter();
+//            //Generate folders based on randomID
+//            generateOutputFolder(rootLocation.resolve("outputs/pdf/").toString(), Long.toString(converter.getID()));
+//            generateOutputFolder(rootLocation.resolve("outputs/images/").toString(), Long.toString(converter.getID()));
+//            //--
+//            converter.PPTX2PDF(new FileInputStream(rootLocation.resolve("inputs/deneme.pptx").toString()), new FileOutputStream(rootLocation.resolve("outputs/pdf/" + converter.getID() + "/out.pdf").toString()));
+//            converter.PDF2PNG(rootLocation.resolve("outputs/pdf/" + converter.getID() + "/out.pdf").toString(), rootLocation.resolve("outputs/images/" + converter.getID()).toString());
+//        }catch (Exception e){
+//            return e.toString();
+//        }
+//        return "Completed.";
 //    }
 
     @GetMapping("/convert")
@@ -42,8 +65,8 @@ public class ConverterController {
         File file = new File(decodedBody);
         FileConverter converter = new FileConverter();
         try {
-            converter.PPTX2PDF(new FileInputStream(decodedBody), new FileOutputStream(file.getParent() + "/current.pdf"));
-            converter.PDF2PNG(file.getParent() + "/current.pdf", rootLocation.resolve("outputs/images").toString());
+            converter.PPTX2PDF(new FileInputStream(decodedBody), new FileOutputStream(rootLocation.resolve("outputs/pdf/current.pdf").toString()));
+            converter.PDF2PNG(rootLocation.resolve("outputs/pdf/current.pdf").toString(), rootLocation.resolve("outputs/images").toString());
         }catch (Exception e){
             return e.toString();
         }
@@ -54,12 +77,24 @@ public class ConverterController {
     public String convertDefault() throws Exception {
         try {
             FileConverter converter = new FileConverter();
-             converter.PPTX2PDF(new FileInputStream(rootLocation.resolve("inputs/deneme.pptx").toString()), new FileOutputStream(rootLocation.resolve("outputs/pdf/current.pdf").toString()));
-             converter.PDF2PNG(rootLocation.resolve("outputs/pdf/current.pdf").toString(), rootLocation.resolve("outputs/images").toString());
+            converter.PPTX2PDF(new FileInputStream(rootLocation.resolve("inputs/deneme.pptx").toString()), new FileOutputStream(rootLocation.resolve("outputs/pdf/current.pdf").toString()));
+            converter.PDF2PNG(rootLocation.resolve("outputs/pdf/current.pdf").toString(), rootLocation.resolve("outputs/images").toString());
         }catch (Exception e){
             return e.toString();
         }
         return "Completed.";
+    }
+
+    //Utilities-------------------------------------------------------------------
+
+    private boolean generateOutputFolder(String folder, String nameOfFolder) {
+        try {
+            File file = new File(folder + "/" + nameOfFolder);
+            file.mkdir();
+        }catch (Exception e) {
+            return false;
+        }
+        return true;
     }
 
     private String getBase64Decoded(String encodedString) {
