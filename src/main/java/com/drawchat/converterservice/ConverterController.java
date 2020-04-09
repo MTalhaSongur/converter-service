@@ -1,5 +1,6 @@
 package com.drawchat.converterservice;
 
+import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -7,7 +8,6 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Base64;
@@ -17,7 +17,7 @@ public class ConverterController {
 
     private final Path rootLocation = Paths.get("filestorage");
 
-    //
+    //Decomment this when Separate ID folders are needed.
 //    @GetMapping("/convert")
 //    public String convert( @RequestBody String req) throws Exception {
 //        if(req == null || req == "")
@@ -62,9 +62,15 @@ public class ConverterController {
             return "ERROR : No body received!! Cannot Convert Image";
 
         String decodedBody = getBase64Decoded(req);
-        File file = new File(decodedBody);
-        FileConverter converter = new FileConverter();
         try {
+            FileConverter converter = new FileConverter();
+            //Clear storage outputs.
+            FileUtils.cleanDirectory(new File(rootLocation.resolve("outputs/pdf").toString()));
+            System.out.println("Folder Cleaned at : " + rootLocation.resolve("outputs/pdf").toString());
+            FileUtils.cleanDirectory(new File(rootLocation.resolve("outputs/images").toString()));
+            System.out.println("Folder Cleaned at : " + rootLocation.resolve("outputs/images").toString());
+            //-
+
             converter.PPTX2PDF(new FileInputStream(decodedBody), new FileOutputStream(rootLocation.resolve("outputs/pdf/current.pdf").toString()));
             converter.PDF2PNG(rootLocation.resolve("outputs/pdf/current.pdf").toString(), rootLocation.resolve("outputs/images").toString());
         }catch (Exception e){
@@ -77,6 +83,14 @@ public class ConverterController {
     public String convertDefault() throws Exception {
         try {
             FileConverter converter = new FileConverter();
+
+            //Clear storage outputs.
+            FileUtils.cleanDirectory(new File(rootLocation.resolve("outputs/pdf").toString()));
+            System.out.println("Folder Cleaned at : " + rootLocation.resolve("outputs/pdf").toString());
+            FileUtils.cleanDirectory(new File(rootLocation.resolve("outputs/images").toString()));
+            System.out.println("Folder Cleaned at : " + rootLocation.resolve("outputs/images").toString());
+            //-
+
             converter.PPTX2PDF(new FileInputStream(rootLocation.resolve("inputs/deneme.pptx").toString()), new FileOutputStream(rootLocation.resolve("outputs/pdf/current.pdf").toString()));
             converter.PDF2PNG(rootLocation.resolve("outputs/pdf/current.pdf").toString(), rootLocation.resolve("outputs/images").toString());
         }catch (Exception e){
