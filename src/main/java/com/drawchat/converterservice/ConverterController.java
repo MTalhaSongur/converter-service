@@ -1,14 +1,14 @@
-//package com.drawchat.converterservice;
-//
-//import org.springframework.http.MediaType;
-//import org.springframework.web.bind.annotation.GetMapping;
-//import org.springframework.web.bind.annotation.ResponseBody;
-//import org.springframework.web.bind.annotation.RestController;
-//import java.io.*;
-//import java.nio.file.Files;
-//
-//@RestController
-//public class ConverterController {
+package com.drawchat.converterservice;
+
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
+import java.io.*;
+import java.nio.file.Files;
+
+@RestController
+public class ConverterController {
 //    @GetMapping(
 //            value = "/getConvertedImage",
 //            produces = MediaType.IMAGE_PNG_VALUE
@@ -25,4 +25,4 @@
 //        byte[] fileContent = Files.readAllBytes(fi.toPath());
 //        return fileContent;
 //    }
-//}
+}

@@ -7,10 +7,11 @@ import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
@@ -53,9 +54,9 @@ public class FileDownloadController {
 //        //TODO:Remove this after showing example.
 //        //TODO:Reset Files after each file
 //        //TODO:Every time user wants to get a new page whole pptx file converts again. Get pages from temp if its already rendered.
-//        FileConverter converter = new FileConverter();
-//        converter.PPTX2PDF(new FileInputStream(rootLocation.resolve("inputs/deneme.pptx").toString()), new FileOutputStream(rootLocation.resolve("outputs/pdf/current.pdf").toString()));
-//        converter.PDF2PNG(rootLocation.resolve("outputs/pdf/current.pdf").toString(), rootLocation.resolve("outputs/images").toString());
+        //FileConverter converter = new FileConverter();
+       // converter.PPTX2PDF(new FileInputStream(rootLocation.resolve("inputs/deneme.pptx").toString()), new FileOutputStream(rootLocation.resolve("outputs/pdf/current.pdf").toString()));
+        //converter.PDF2PNG(rootLocation.resolve("outputs/pdf/current.pdf").toString(), rootLocation.resolve("outputs/images").toString());
 
 
         try {
@@ -74,9 +75,43 @@ public class FileDownloadController {
         }
     }
 
+    @GetMapping("/fileinfo")
+    public Map<String, String> getPaths() throws IOException {
+        HashMap<String, String> map = new HashMap<>();
+        map.put("PageSize", Long.toString(getNumberOfFilesInFolder(rootLocation.toString() + "/outputs/images/")));
+        String[] files = getFilesInFolder(rootLocation.toString() + "/outputs/images/");
+        Arrays.sort(files);
+        for(int i = 0; i < files.length; i++) {
+            map.put("Page" + Paths.get(files[i]).getFileName().toString().replace(".png", ""), files[i]);
+        }
+        return map;
+    }
+
     //--------------------------------------------------------------------------------------------------------------------
     //-----------------------------------------------------UTILITIES------------------------------------------------------
     //--------------------------------------------------------------------------------------------------------------------
+
+    private String[] getFilesInFolder(String path) throws IOException {
+        ArrayList<String> filesInFolder = new ArrayList<>();
+        Files.walk(Paths.get(path))
+                .filter(p -> p.toString().endsWith(".png"))
+                .forEach(p -> {
+                    try {
+                        filesInFolder.add(p.toAbsolutePath().toString());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                });
+        return filesInFolder.toArray(new String[filesInFolder.size()]);
+    }
+
+    private long getNumberOfFilesInFolder(String path) throws IOException {
+        long count = 0;
+        try (Stream<Path> files = Files.list(Paths.get(path))) {
+            count = files.count();
+        }
+        return count;
+    }
 
     public Resource loadFile(String filename, String fileExtension) {
         try {
