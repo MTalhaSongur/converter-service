@@ -11,7 +11,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
@@ -57,7 +56,6 @@ public class FileDownloadController {
         //FileConverter converter = new FileConverter();
        // converter.PPTX2PDF(new FileInputStream(rootLocation.resolve("inputs/deneme.pptx").toString()), new FileOutputStream(rootLocation.resolve("outputs/pdf/current.pdf").toString()));
         //converter.PDF2PNG(rootLocation.resolve("outputs/pdf/current.pdf").toString(), rootLocation.resolve("outputs/images").toString());
-
 
         try {
             Resource fileR = loadFile(filename, ".png");
@@ -113,7 +111,7 @@ public class FileDownloadController {
         return count;
     }
 
-    public Resource loadFile(String filename, String fileExtension) {
+    private Resource loadFile(String filename, String fileExtension) {
         try {
             Path file = rootLocation.resolve("outputs/images/" + filename + fileExtension);
             Resource resource = new UrlResource(file.toUri());
@@ -128,7 +126,7 @@ public class FileDownloadController {
         }
     }
 
-    public Stream<Path> loadFiles() {
+    private Stream<Path> loadFiles() {
         try {
             return Files.walk(this.rootLocation, 1)
                     .filter(path -> !path.equals(this.rootLocation))

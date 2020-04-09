@@ -27,7 +27,6 @@ import javax.imageio.ImageIO;
 //This class is responsible for getting pptx file from sender and returning the .png file instead.
 public class FileConverter {
 
-    private final Path rootLocation = Paths.get("filestorage");
     private InputStream inStream;
     private OutputStream outStream;
     private XSLFSlide[] slides;
