@@ -1,9 +1,7 @@
 package com.drawchat.converterservice;
 
 import org.apache.tomcat.util.http.fileupload.FileUtils;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -56,12 +54,14 @@ public class ConverterController {
 //        return "Completed.";
 //    }
 
-    @GetMapping("/convert")
-    public String convert( @RequestBody String req) throws Exception {
+    @RequestMapping(value = "/convert")
+    public String convert(@RequestBody String req) throws Exception {
         if(req == null || req == "")
             return "ERROR : No body received!! Cannot Convert Image";
 
+        req = req.split("=")[1];
         String decodedBody = getBase64Decoded(req);
+
         try {
             FileConverter converter = new FileConverter();
             //Clear storage outputs.
