@@ -1,7 +1,5 @@
 package com.drawchat.converterservice;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
@@ -13,10 +11,7 @@ import java.util.stream.Stream;
 
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -49,14 +44,6 @@ public class FileDownloadController {
             produces = MediaType.IMAGE_PNG_VALUE
     )
     public byte[] downloadFile(@PathVariable String filename) throws Exception {
-//        //Basic conversion and view example
-//        //TODO:Remove this after showing example.
-//        //TODO:Reset Files after each file
-//        //TODO:Every time user wants to get a new page whole pptx file converts again. Get pages from temp if its already rendered.
-        //FileConverter converter = new FileConverter();
-       // converter.PPTX2PDF(new FileInputStream(rootLocation.resolve("inputs/deneme.pptx").toString()), new FileOutputStream(rootLocation.resolve("outputs/pdf/current.pdf").toString()));
-        //converter.PDF2PNG(rootLocation.resolve("outputs/pdf/current.pdf").toString(), rootLocation.resolve("outputs/images").toString());
-
         try {
             Resource fileR = loadFile(filename, ".png");
             //NOTE:IF you want to download the file instead of showing on the browser screen, uncomment the code below and change returning type to Response Entity.

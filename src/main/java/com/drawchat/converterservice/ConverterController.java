@@ -1,6 +1,5 @@
 package com.drawchat.converterservice;
 
-import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
@@ -15,7 +14,6 @@ public class ConverterController {
 
     private final Path rootLocation = Paths.get("filestorage");
 
-    //Decomment this when Separate ID folders are needed.
     @RequestMapping("/convert")
     public String convert( @RequestBody String req) throws Exception {
         if(req == null || req == "")
