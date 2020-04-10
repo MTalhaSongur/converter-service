@@ -31,6 +31,8 @@ public class FileConverter {
     private OutputStream outStream;
     private XSLFSlide[] slides;
     private int pageSize;
+    private int width;
+    private int height;
     private final long ID;
 
     public FileConverter() {
@@ -45,8 +47,24 @@ public class FileConverter {
         return pageSize;
     }
 
+    public int getWidth() {
+        return this.width;
+    }
+
+    public int getHeight() {
+        return this.height;
+    }
+
     private void setPageSize(int size) {
         pageSize = size;
+    }
+
+    private void setWidth(int width) {
+        this.width = width;
+    }
+
+    private void setHeight(int height) {
+        this.height = height;
     }
 
 
@@ -108,6 +126,11 @@ public class FileConverter {
         System.out.println("Images copied to Folder: "+ destinationFile.getName());
         PDDocument document = PDDocument.load(sourceFilePath);
         List<PDPage> list = document.getDocumentCatalog().getAllPages();
+        //GET IMAGE WIDTH AND HEIGHT
+        setWidth(list.get(0).convertToImage().getWidth());
+        setHeight(list.get(0).convertToImage().getHeight());
+        //
+
         System.out.println("Total files to be converted -> "+ list.size());
 
         String fileName = sourceFile.getName().replace(".pdf", "");

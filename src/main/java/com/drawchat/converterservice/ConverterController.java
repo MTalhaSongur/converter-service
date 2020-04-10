@@ -33,7 +33,8 @@ public class ConverterController {
         }catch (Exception e){
             return e.toString();
         }
-        return "Pagesize :" + converter.getPageSize() + "," + rootLocation.resolve("outputs/images").toAbsolutePath() + "/" + Long.toString(converter.getID());
+
+        return "path:" + rootLocation.resolve("outputs/images").toAbsolutePath() + "/" + Long.toString(converter.getID()) + ",size:" + converter.getPageSize() + ",width:" + converter.getWidth() + ",height:" + converter.getHeight();
     }
 
     @GetMapping("/convertdefault")
@@ -49,7 +50,9 @@ public class ConverterController {
         }catch (Exception e){
             return e.toString();
         }
-        return "Pagesize :" + converter.getPageSize() + "," + rootLocation.resolve("outputs/images").toAbsolutePath() + "/" + Long.toString(converter.getID());
+
+        return "path:" + rootLocation.resolve("outputs/images").toAbsolutePath() + "/" + Long.toString(converter.getID()) + ",size:" + converter.getPageSize() + ",width:" + converter.getWidth() + ",height:" + converter.getHeight();
+
     }
 
 //    @RequestMapping(value = "/convert")
