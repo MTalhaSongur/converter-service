@@ -30,6 +30,7 @@ public class FileConverter {
     private InputStream inStream;
     private OutputStream outStream;
     private XSLFSlide[] slides;
+    private int pageSize;
     private final long ID;
 
     public FileConverter() {
@@ -39,6 +40,15 @@ public class FileConverter {
     public long getID() {
         return ID;
     }
+
+    public int getPageSize() {
+        return pageSize;
+    }
+
+    private void setPageSize(int size) {
+        pageSize = size;
+    }
+
 
     public void PPTX2PDF(InputStream inStream, OutputStream outStream) throws Exception {
         //TODO:Remnant from constructor. Remove the variables.
@@ -55,6 +65,9 @@ public class FileConverter {
 
         PdfWriter writer = PdfWriter.getInstance(document, outStream);
         document.open();
+
+        //Set the page size for future use outside of this class.
+        setPageSize(getNumSlides());
 
         for (int i = 0; i < getNumSlides(); i++) {
 
