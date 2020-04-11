@@ -24,12 +24,14 @@ import org.springframework.util.FileSystemUtils;
 
 import javax.imageio.ImageIO;
 
+import static java.lang.System.out;
+
 //This class is responsible for getting pptx file from sender and returning the .png file instead.
 public class FileConverter {
 
     private InputStream inStream;
     private OutputStream outStream;
-    private XSLFSlide[] slides;
+    List<XSLFSlide> slides;
     private int pageSize;
     private int width;
     private int height;
@@ -75,7 +77,7 @@ public class FileConverter {
 
         Dimension pgsize = processSlides();
 
-        double zoom = 2; // magnify it by 2 as typical slides are low res
+        double zoom = 1; // magnify it by 2 as typical slides are low res
         AffineTransform at = new AffineTransform();
         at.setToScale(zoom, zoom);
 
@@ -115,15 +117,15 @@ public class FileConverter {
         File sourceFile = new File(sourceFilePath);
         File destinationFile = new File(targetFolder);
         if(!destinationFile.exists()) {
-            System.out.println("No folder detected at given path. Creating a new folder");
+            out.println("No folder detected at given path. Creating a new folder");
             destinationFile.mkdir();
-            System.out.println("Folder Created  at-> "+ destinationFile.getAbsolutePath());
+            out.println("Folder Created  at-> "+ destinationFile.getAbsolutePath());
         }
         if(!sourceFile.exists()) {
             System.err.println("ERROR : Source folder does not exists!!!");
             return;
         }
-        System.out.println("Images copied to Folder: "+ destinationFile.getName());
+        out.println("Images copied to Folder: "+ destinationFile.getName());
         PDDocument document = PDDocument.load(sourceFilePath);
         List<PDPage> list = document.getDocumentCatalog().getAllPages();
         //GET IMAGE WIDTH AND HEIGHT
@@ -131,19 +133,59 @@ public class FileConverter {
         setHeight(list.get(0).convertToImage().getHeight());
         //
 
-        System.out.println("Total files to be converted -> "+ list.size());
+        out.println("Total files to be converted -> "+ list.size());
 
         String fileName = sourceFile.getName().replace(".pdf", "");
         int pageNumber = 1;
         for (PDPage page : list) {
             BufferedImage image = page.convertToImage();
             File outputfile = new File(targetFolder + "/" + pageNumber +".png");
-            System.out.println("Image Created -> "+ outputfile.getName());
+            out.println("Image Created -> "+ outputfile.getName());
             ImageIO.write(image, "png", outputfile);
             pageNumber++;
         }
         document.close();
-        System.out.println("Converted Images are saved at -> "+ destinationFile.getAbsolutePath());
+        out.println("Converted Images are saved at -> "+ destinationFile.getAbsolutePath());
+    }
+
+    public void PPTX2PNG(InputStream inStream, String targetFolder) throws Exception {
+        XMLSlideShow ppt = new XMLSlideShow(inStream);
+        inStream.close();
+
+        double zoom = 2; // MAGNIFIER
+        AffineTransform at = new AffineTransform();
+        at.setToScale(zoom, zoom);
+
+        Dimension pgsize = ppt.getPageSize();
+
+        //Get width and height
+        setWidth(pgsize.width * (int)zoom);
+        setHeight(pgsize.height * (int)zoom);
+        //-
+
+        slides = ppt.getSlides();
+        //get the number of slides
+        setPageSize(slides.size());
+        for (int i = 0; i < slides.size(); i++) {
+            BufferedImage img = new BufferedImage((int)Math.ceil(pgsize.width*zoom), (int)Math.ceil(pgsize.height*zoom), BufferedImage.TYPE_INT_RGB);
+            Graphics2D graphics = img.createGraphics();
+            graphics.setTransform(at);
+
+            graphics.setPaint(Color.white);
+            graphics.fill(new Rectangle2D.Float(0, 0, pgsize.width, pgsize.height));
+
+            //Render
+            try {
+                slides.get(i).draw(graphics);
+            }catch (Exception e) {
+                //Just Ignore
+            }
+
+            File outputfile = new File(targetFolder + "/" + (i + 1) +".png");
+            out.println("Image Created -> "+ outputfile.getName());
+            ImageIO.write(img, "png", outputfile);
+        }
+        out.println("Converted Images are saved at -> "+ targetFolder);
     }
 
     public boolean resetFiles() {
@@ -166,15 +208,15 @@ public class FileConverter {
     }
 
     private int getNumSlides(){
-        return slides.length;
+        return slides.size();
     }
 
     private void drawOntoThisGraphic(int index, Graphics2D graphics){
-        slides[index].draw(graphics);
+        slides.get(index).draw(graphics);
     }
 
     private Color getSlideBGColor(int index){
-        return slides[index].getBackground().getFillColor();
+        return slides.get(index).getBackground().getFillColor();
     }
 
     private long getRandomNumber(long sIndex, long fIndex) {
