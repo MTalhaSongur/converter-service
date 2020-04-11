@@ -4,7 +4,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Base64;
@@ -29,6 +29,7 @@ public class ConverterController {
             //generateOutputFolder(rootLocation.resolve("outputs/pdf/").toString(), Long.toString(converter.getID()));
             generateOutputFolder(rootLocation.resolve("outputs/images/").toString(), Long.toString(converter.getID()));
             //--
+            //Uncomment if you want to convert to PDF or convert to PNG from PDF
 //            converter.PPTX2PDF(new FileInputStream(decodedBody), new FileOutputStream(rootLocation.resolve("outputs/pdf/" + converter.getID() + "/out.pdf").toString()));
 //            converter.PDF2PNG(rootLocation.resolve("outputs/pdf/" + converter.getID() + "/out.pdf").toString(), rootLocation.resolve("outputs/images/" + converter.getID()).toString());
             converter.PPTX2PNG(new FileInputStream(decodedBody),rootLocation.resolve("outputs/images/" + converter.getID()).toAbsolutePath().toString());
@@ -49,6 +50,7 @@ public class ConverterController {
             //generateOutputFolder(rootLocation.resolve("outputs/pdf/").toString(), Long.toString(converter.getID()));
             generateOutputFolder(rootLocation.resolve("outputs/images/").toString(), Long.toString(converter.getID()));
             //--
+            //Uncomment if you want to convert to PDF or convert to PNG from PDF
 //            converter.PPTX2PDF(new FileInputStream(rootLocation.resolve("inputs/deneme.pptx").toString()), new FileOutputStream(rootLocation.resolve("outputs/pdf/" + converter.getID() + "/out.pdf").toString()));
 //            converter.PDF2PNG(rootLocation.resolve("outputs/pdf/" + converter.getID() + "/out.pdf").toString(), rootLocation.resolve("outputs/images/" + converter.getID()).toString());
             converter.PPTX2PNG(new FileInputStream(rootLocation.resolve("inputs/deneme.pptx").toString()),rootLocation.resolve("outputs/images/" + converter.getID()).toAbsolutePath().toString());
@@ -58,51 +60,6 @@ public class ConverterController {
 
         return "path:" + rootLocation.resolve("outputs/images").toAbsolutePath() + "/" + Long.toString(converter.getID()) + ",size:" + converter.getPageSize() + ",width:" + converter.getWidth() + ",height:" + converter.getHeight();
     }
-
-//    @RequestMapping(value = "/convert")
-//    public String convert(@RequestBody String req) throws Exception {
-//        if(req == null || req == "")
-//            return "ERROR : No body received!! Cannot Convert Image";
-//
-//        req = req.split("=")[1];
-//        String decodedBody = getBase64Decoded(req);
-//
-//        try {
-//            FileConverter converter = new FileConverter();
-//            //Clear storage outputs.
-//            FileUtils.cleanDirectory(new File(rootLocation.resolve("outputs/pdf").toString()));
-//            System.out.println("Folder Cleaned at : " + rootLocation.resolve("outputs/pdf").toString());
-//            FileUtils.cleanDirectory(new File(rootLocation.resolve("outputs/images").toString()));
-//            System.out.println("Folder Cleaned at : " + rootLocation.resolve("outputs/images").toString());
-//            //-
-//
-//            converter.PPTX2PDF(new FileInputStream(decodedBody), new FileOutputStream(rootLocation.resolve("outputs/pdf/current.pdf").toString()));
-//            converter.PDF2PNG(rootLocation.resolve("outputs/pdf/current.pdf").toString(), rootLocation.resolve("outputs/images").toString());
-//        }catch (Exception e){
-//            return e.toString();
-//        }
-//        return "Completed.";
-//    }
-//
-//    @GetMapping("/convertdefault")
-//    public String convertDefault() throws Exception {
-//        try {
-//            FileConverter converter = new FileConverter();
-//
-//            //Clear storage outputs.
-//            FileUtils.cleanDirectory(new File(rootLocation.resolve("outputs/pdf").toString()));
-//            System.out.println("Folder Cleaned at : " + rootLocation.resolve("outputs/pdf").toString());
-//            FileUtils.cleanDirectory(new File(rootLocation.resolve("outputs/images").toString()));
-//            System.out.println("Folder Cleaned at : " + rootLocation.resolve("outputs/images").toString());
-//            //-
-//
-//            converter.PPTX2PDF(new FileInputStream(rootLocation.resolve("inputs/deneme.pptx").toString()), new FileOutputStream(rootLocation.resolve("outputs/pdf/current.pdf").toString()));
-//            converter.PDF2PNG(rootLocation.resolve("outputs/pdf/current.pdf").toString(), rootLocation.resolve("outputs/images").toString());
-//        }catch (Exception e){
-//            return e.toString();
-//        }
-//        return "Completed.";
-//    }
 
     //Utilities-------------------------------------------------------------------
 
